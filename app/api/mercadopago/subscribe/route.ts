@@ -62,9 +62,14 @@ export async function POST(request: NextRequest) {
         init_point: response.init_point,
         initPoint: response.init_point,
       })
-    } catch (error) {
-      console.error('❌ Mercado Pago ERRO REAL:', error?.cause || error)
-      throw error
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('❌ Mercado Pago ERRO REAL:', error.cause ?? error.message)
+        throw error
+      }
+
+      console.error('❌ Mercado Pago ERRO REAL:', error)
+      throw new Error('Erro desconhecido no Mercado Pago')
     }
   } catch (error) {
     console.error('Erro ao processar assinatura:', error)

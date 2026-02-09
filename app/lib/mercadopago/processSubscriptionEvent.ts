@@ -78,6 +78,10 @@ export async function processSubscriptionEvent(event: any) {
   console.log('📌 Subscription existente encontrada:', existingSubscription.id)
 
   // 5️⃣ Preparar dados para atualização
+  if (!subscriptionData.status) {
+    throw new Error('Status da assinatura não veio do Mercado Pago');
+  }
+
   const updateData: any = {
     status: mapStatus(subscriptionData.status),
     current_period_end: subscriptionData.next_payment_date
