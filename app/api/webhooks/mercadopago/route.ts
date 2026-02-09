@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { processSubscriptionEvent } from "../../../lib/mercadopago/processSubscriptionEvent";
 
@@ -5,7 +6,7 @@ export async function POST(req: NextRequest) {
   // Teste de variáveis de ambiente
   console.log("ENV CHECK", {
     hasMpToken: !!process.env.MERCADOPAGO_ACCESS_TOKEN,
-    hasSupabaseUrl: !!process.env.SUPABASE_URL,
+    hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     hasServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
   });
 
