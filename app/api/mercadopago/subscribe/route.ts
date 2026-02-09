@@ -1,4 +1,5 @@
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 import { NextResponse, NextRequest } from 'next/server'
 import { createClient } from '@/app/lib/supabase/server'
 import { MercadoPagoConfig, PreApproval } from 'mercadopago'
