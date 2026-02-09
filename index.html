@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <title>FechaZap Pro</title>
+  </head>
+
+  <body>
+    <h1>Entrar na lista</h1>
+
+    <form id="lead-form">
+      <input
+        type="tel"
+        id="telefone"
+        placeholder="Seu WhatsApp (DDD + número)"
+        required
+      />
+      <button type="submit">Enviar</button>
+    </form>
+
+    <p id="msg"></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+      const supabaseUrl = "https://SEU_PROJECT_ID.supabase.co";
+      const supabaseKey = "SUA_PUBLIC_ANON_KEY";
+      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+      const form = document.getElementById("lead-form");
+      const msg = document.getElementById("msg");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msg.textContent = "Enviando...";
+
+        const telefone = document.getElementById("telefone").value.trim();
+
+        const { error } = await supabase
+          .from("leads")
+          .insert([{ telefone }]);
+
+        if (error) {
+          console.error(error);
+          msg.textContent = "Erro ao enviar";
+          return;
+        }
+
+        msg.textContent = "Recebido com sucesso!";
+        form.reset();
+      });
+    </script>
+  </body>
+</html>
