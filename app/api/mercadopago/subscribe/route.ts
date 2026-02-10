@@ -1,6 +1,9 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextResponse, NextRequest } from 'next/server'
 import { createClient } from '@/app/lib/supabase/server'
-import { MercadoPagoConfig, PreApproval } from 'mercadopago'
 
 /**
  * Endpoint POST para criar assinatura (pré-aprovação) no Mercado Pago
@@ -30,6 +33,8 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       )
     }
+
+    const { MercadoPagoConfig, PreApproval } = await import("mercadopago");
 
     // Configura o SDK do Mercado Pago
     const client = new MercadoPagoConfig({
