@@ -43,6 +43,8 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
+      console.log('[LOGIN] Enviando requisição para /api/auth/login')
+      
       // Envia requisição POST para o endpoint de login
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -52,7 +54,30 @@ export default function LoginPage() {
         body: JSON.stringify({ email }),
       })
 
-      const data = await response.json()
+      console.log('[LOGIN] Status:', response.status)
+      console.log('[LOGIN] Content-Type:', response.headers.get('content-type'))
+      console.log('[LOGIN] Content-Length:', response.headers.get('content-length'))
+
+      // Verifica se há conteúdo para parsear
+      const contentType = response.headers.get('content-type')
+      const contentLength = response.headers.get('content-length')
+      
+      let data: { error?: string; success?: boolean } = {}
+
+      // Só tenta parsear JSON se houver conteúdo
+      if (contentLength !== '0' && contentType?.includes('application/json')) {
+        try {
+          data = await response.json()
+          console.log('[LOGIN] Dados recebidos:', data)
+        } catch (parseErr) {
+          console.error('[LOGIN] Erro ao parsear JSON:', parseErr)
+          const text = await response.text()
+          console.error('[LOGIN] Response body (text):', text)
+          throw new Error('Resposta inválida do servidor')
+        }
+      } else {
+        console.warn('[LOGIN] Resposta vazia ou sem JSON')
+      }
 
       if (!response.ok) {
         // Exibe erro retornado pela API
@@ -64,7 +89,7 @@ export default function LoginPage() {
       setSuccess(true)
       setEmail('') // Limpa o campo de email
     } catch (err) {
-      console.error('Erro ao fazer login:', err)
+      console.error('[LOGIN] Erro ao fazer login:', err)
       setError('Erro de conexão. Tente novamente.')
     } finally {
       setLoading(false)
