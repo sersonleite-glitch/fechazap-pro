@@ -37,15 +37,11 @@ export default function LoginPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
-    // Limpa mensagens anteriores
     setError('')
     setSuccess(false)
     setLoading(true)
 
     try {
-      console.log('[LOGIN] Enviando requisição para /api/auth/login')
-      
-      // Envia requisição POST para o endpoint de login
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -54,43 +50,31 @@ export default function LoginPage() {
         body: JSON.stringify({ email }),
       })
 
-      console.log('[LOGIN] Status:', response.status)
-      console.log('[LOGIN] Content-Type:', response.headers.get('content-type'))
-      console.log('[LOGIN] Content-Length:', response.headers.get('content-length'))
-
-      // Verifica se há conteúdo para parsear
-      const contentType = response.headers.get('content-type')
-      const contentLength = response.headers.get('content-length')
+      // Sempre ler resposta como texto primeiro
+      const text = await response.text()
       
       let data: { error?: string; success?: boolean } = {}
 
-      // Só tenta parsear JSON se houver conteúdo
-      if (contentLength !== '0' && contentType?.includes('application/json')) {
+      // Só parsear JSON se houver conteúdo
+      if (text.trim()) {
         try {
-          data = await response.json()
-          console.log('[LOGIN] Dados recebidos:', data)
-        } catch (parseErr) {
-          console.error('[LOGIN] Erro ao parsear JSON:', parseErr)
-          const text = await response.text()
-          console.error('[LOGIN] Response body (text):', text)
+          data = JSON.parse(text)
+        } catch {
           throw new Error('Resposta inválida do servidor')
         }
-      } else {
-        console.warn('[LOGIN] Resposta vazia ou sem JSON')
+      } else if (!response.ok) {
+        throw new Error('Resposta vazia da API')
       }
 
       if (!response.ok) {
-        // Exibe erro retornado pela API
         setError(data.error || 'Erro ao enviar magic link')
         return
       }
 
-      // Exibe mensagem de sucesso
       setSuccess(true)
-      setEmail('') // Limpa o campo de email
+      setEmail('')
     } catch (err) {
-      console.error('[LOGIN] Erro ao fazer login:', err)
-      setError('Erro de conexão. Tente novamente.')
+      setError(err instanceof Error ? err.message : 'Erro de conexão. Tente novamente.')
     } finally {
       setLoading(false)
     }
