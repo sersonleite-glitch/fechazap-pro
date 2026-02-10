@@ -1,17 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { MercadoPagoConfig, PreApproval } from 'mercadopago'
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!
-})
-
-const preApprovalClient = new PreApproval(mpClient)
-
 function mapStatus(status: string) {
   switch (status) {
     case 'authorized':
@@ -30,6 +19,22 @@ function mapStatus(status: string) {
 }
 
 export async function processSubscriptionEvent(event: any) {
+  // Initialize clients inside function to prevent build-time evaluation
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const mercadoPagoToken = process.env.MERCADOPAGO_ACCESS_TOKEN
+
+  if (!supabaseUrl || !serviceRoleKey || !mercadoPagoToken) {
+    console.log('❌ Missing required environment variables')
+    return { success: false }
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey)
+  const mpClient = new MercadoPagoConfig({
+    accessToken: mercadoPagoToken
+  })
+  const preApprovalClient = new PreApproval(mpClient)
+
   console.log('🔄 Processando evento:', event)
 
   // 1️⃣ Validar tipo de evento
