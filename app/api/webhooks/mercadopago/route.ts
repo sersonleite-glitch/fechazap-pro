@@ -1,7 +1,8 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from "next/server";
-import { processSubscriptionEvent } from "../../../lib/mercadopago/processSubscriptionEvent";
 
 export async function POST(req: NextRequest) {
   // Teste de variáveis de ambiente
@@ -15,6 +16,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     console.log("📩 Webhook recebido:", body);
+
+    const { processSubscriptionEvent } = await import("../../../lib/mercadopago/processSubscriptionEvent");
 
     await processSubscriptionEvent(body);
 
