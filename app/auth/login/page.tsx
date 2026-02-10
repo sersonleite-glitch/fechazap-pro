@@ -37,13 +37,11 @@ export default function LoginPage() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
-    // Limpa mensagens anteriores
     setError('')
     setSuccess(false)
     setLoading(true)
 
     try {
-      // Envia requisição POST para o endpoint de login
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -52,20 +50,31 @@ export default function LoginPage() {
         body: JSON.stringify({ email }),
       })
 
-      const data = await response.json()
+      // Ler resposta como texto primeiro
+      const text = await response.text()
+      
+      let data: { error?: string; success?: boolean } = {}
+
+      // Só parsear JSON se houver conteúdo
+      if (text.trim()) {
+        try {
+          data = JSON.parse(text)
+        } catch {
+          throw new Error('Resposta inválida do servidor')
+        }
+      } else if (!response.ok) {
+        throw new Error('Resposta vazia da API')
+      }
 
       if (!response.ok) {
-        // Exibe erro retornado pela API
         setError(data.error || 'Erro ao enviar magic link')
         return
       }
 
-      // Exibe mensagem de sucesso
       setSuccess(true)
-      setEmail('') // Limpa o campo de email
+      setEmail('')
     } catch (err) {
-      console.error('Erro ao fazer login:', err)
-      setError('Erro de conexão. Tente novamente.')
+      setError(err instanceof Error ? err.message : 'Erro de conexão. Tente novamente.')
     } finally {
       setLoading(false)
     }
