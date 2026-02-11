@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { getSupabaseClient } from "../lib/supabaseClient";
 
 export default function Page() {
+  const supabase = getSupabaseClient();
+
   const [telefone, setTelefone] = useState("");
   const [msg, setMsg] = useState("");
 
