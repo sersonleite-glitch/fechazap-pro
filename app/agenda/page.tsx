@@ -3,9 +3,11 @@
 export const dynamic = "force-dynamic";
 
 import { useState } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import { getSupabaseClient } from "../../lib/supabaseClient";
 
 export default function AgendaPage() {
+  const supabase = getSupabaseClient();
+
   const [customerId, setCustomerId] = useState("");
   const [data, setData] = useState("");
   const [horario, setHorario] = useState("");
